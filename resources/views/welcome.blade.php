@@ -9,6 +9,9 @@
 
         <!-- Fonts -->
         <link href="https://fonts.googleapis.com/css?family=Raleway:100,600" rel="stylesheet" type="text/css">
+        
+
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 
         <!-- Styles -->
         <style>
@@ -66,30 +69,94 @@
     </head>
     <body>
         <div class="flex-center position-ref full-height">
-            @if (Route::has('login'))
-                <div class="top-right links">
-                    @if (Auth::check())
-                        <a href="{{ url('/home') }}">Home</a>
-                    @else
-                        <a href="{{ url('/login') }}">Login</a>
-                        <a href="{{ url('/register') }}">Register</a>
-                    @endif
-                </div>
-            @endif
 
-            <div class="content">
-                <div class="title m-b-md">
-                    Laravel
-                </div>
 
-                <div class="links">
-                    <a href="https://laravel.com/docs">Documentation</a>
-                    <a href="https://laracasts.com">Laracasts</a>
-                    <a href="https://laravel-news.com">News</a>
-                    <a href="https://forge.laravel.com">Forge</a>
-                    <a href="https://github.com/laravel/laravel">GitHub</a>
-                </div>
+
+            <div class="col-md-3">
+                Regions : <select id="regions"> <option disabled="" >Selectioner la region </option> </select>
             </div>
+
+            <div class="col-md-3">
+                Semesters 1 : <select id="semesters"> 
+                    <option value="s1">S 1</option> 
+                    <option value="s2">S 2</option> 
+                    <option value="s3">S 3</option> 
+                    <option value="s4">S 4</option> 
+                </select>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                Semesters 2 : <select id="semesters2"> 
+                    <option value="s1">S 1</option> 
+                    <option value="s2">S 2</option> 
+                    <option value="s3">S 3</option> 
+                    <option value="s4">S 4</option> 
+                </select>
+            </div>
+
+            <div class="col-md-3">
+                Villes : <select id="villes"></select>
+            </div>
+
+            <div class="col-md-3">
+                Students : <select id="students"></select>
+            </div>
+
+
+
+            <script>
+                $(document).ready( function(){
+
+                    $.get("{{ route('load_regions') }}", function(data, response){
+                        
+                        for (var i = 0; i < data.length; i++) {
+                            $('#regions').append('<option value="'+data[i].id+'">'+data[i].intitule_fr+'</option>');
+                        }
+                    })
+
+                    $('#regions,#semesters').change( function(){
+
+                        var url_ = "{{ route('load_villes') }}";
+
+                        var region_name = $('#regions').val();
+                        var semester_name = $("#semesters").val();
+                        var semester_name_2 = $("#semesters2").val();
+
+                        $('#villes').html('');
+
+                        var data_where = {
+                            param_region : region_name,
+                            param_semester_start : semester_name,
+                            param_semester_end : semester_name_2,
+                        };
+
+                        $.get( url_ , data_where , function(data, response){
+                            ///
+                            for (var i = 0; i < data.length; i++) {
+                                $('#villes').append('<option value="'+data[i].id+'">'+data[i].titre+'</option>');
+                            }
+
+                        })
+
+                    });
+
+                    /*-----------------------*/
+
+
+                    $.get("{{ route('load_students') }}", function(data, response){
+                        for (var i = 0; i < data.length; i++) {
+                            $('#students').append('<option value="'+data[i].id+'">'+data[i].prenom_fr+' '+data[i].nom_fr+'</option>');
+                        }
+                    })
+
+
+                });
+            </script>
+
+
+
+
+
+
+
         </div>
     </body>
 </html>
